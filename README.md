@@ -53,6 +53,6 @@ It helps users improve **arithmetic skills** with a **fun and interactive interf
 
 ## 👨‍💻 Author
 
-- [Your Name]  
+- [Baraa Mardini]  
 
 ---
