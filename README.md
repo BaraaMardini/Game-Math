@@ -1,58 +1,181 @@
-# 🎮 Math Game 🧮
+# لعبة Math Game (Math Game)
 
-**Math Game** is a **Windows Forms desktop application** developed in C#.  
-It helps users improve **arithmetic skills** with a **fun and interactive interface**. ✨
+![Language](https://img.shields.io/badge/language-C%23-239120)
+![Framework](https://img.shields.io/badge/framework-.NET%20Windows%20Forms-512BD4)
+![Platform](https://img.shields.io/badge/platform-Windows-0078D6)
+![License](https://img.shields.io/badge/license-Not%20specified-lightgrey)
 
----
+A timed, configurable math quiz desktop game built with C# and Windows Forms.
 
-## 🌟 Features
+## Overview
 
-- ➕➖✖️➗ Supports **addition, subtraction, multiplication, division**, or mixed operations.
-- 🏆 Multiple difficulty levels: **Easy**, **Medium**, **Hard**, **Mixed**.
-- 🔢 Customizable number of questions: **3, 5, 10, 15**.
-- ✅ Real-time **answer checking** and scoring for **correct/incorrect answers**.
-- ⏱️ **Timer countdown** for each question to add challenge.
-- 🏁 End-of-game evaluation showing **win**, **lose**, or **draw**.
-- 🔄 Option to **restart the game** and reset all counters.
+`لعبة Math Game` ("Math Game") is a single-form Windows Forms desktop application that quizzes the player with randomly generated arithmetic questions under a countdown timer. The player configures the number of questions, difficulty level, and operation type via on-screen controls, starts the game, answers each question within a 10-second timer, and receives a win/lose/draw result once all questions have been answered.
 
----
+## Features
 
-## 🛠️ How It Works
+- **Player name field**: a text box pre-filled with a placeholder name that can be edited (purely cosmetic — not otherwise used in the game logic shown).
+- **Configurable question count**: radio buttons for 3, 5, 10, or 15 questions per game.
+- **Question level selection** via a combo box: `Easy`, `Med`, `Hard`, or `Mix`, controlling the numeric range used to generate operands (Easy: 1–4, Med: 1–9, Hard: 1–14, Mix/other: 1–19, per the `rnd.Next` upper-bound-exclusive ranges used).
+- **Operation type selection** via a combo box: `Add`, `Sub`, `Mul`, `Div`, or `Mix` (which randomly picks one of the four operations for each question).
+- **Start Game** control (a radio button) that generates and displays the first question and starts the countdown timer.
+- **10-second countdown timer per question**: a visible timer label counts down each second; if the timer reaches zero before the player answers, the question is automatically counted as wrong, the "Check Answer" control is disabled, and a "You are Lost" message is shown.
+- **Answer checking**: the "Check Answer" control evaluates the player's typed answer against the computed value of the current question (using `DataTable.Compute` to evaluate the question string), shows a True/False result message box, and updates running right/wrong answer counters.
+- **Next Question** control: clears the question/answer fields, generates a new random question, resets the timer to 10 seconds, and re-enables answer checking; it is automatically disabled once the second-to-last question has been reached (based on the running answered-count).
+- **Running score display**: two text boxes show the current count of correct and incorrect answers, updated after each check.
+- **End-of-game result**: once the number of answered questions (right + wrong) reaches the selected question count, a message box declares "You Are Win", "You Are False" (i.e., you lost), or "Draw" based on the comparison of right vs. wrong counts, and the level/operation-type combo boxes are disabled.
+- **Restart Game** control: resets all counters, score displays, question/answer fields, question-count radio buttons, and combo boxes back to their initial state, and stops the active timer.
 
-1. 🎯 Select the **operation type** and **difficulty level**.  
-2. 📊 Choose the **number of questions** to attempt.  
-3. 🚀 Start the game and answer questions **within the timer**.  
-4. ▶️ Click **Next Question** or let the timer run out to proceed.  
-5. 🏅 The game tracks **correct and incorrect answers**, showing results at the end.
+## Screenshots
 
----
+_No screenshots are included in the provided project files._
 
-## 💻 Technical Details
+## Demo
 
-- Built with **C#** and **Windows Forms**.  
-- Randomized **question generation** based on selected difficulty.  
-- Dynamic UI updates for **timers, scores, and questions**.  
-- Implements **basic arithmetic logic** with real-time computation and validation.
+Not specified.
 
----
+## Tech Stack
 
-## 📸 Screenshots
+| Category | Technology |
+|---|---|
+| Language | C# |
+| UI Framework | Windows Forms (WinForms) |
+| Runtime | .NET (version not specified — no `.csproj`/project file was provided) |
+| Key .NET APIs | `System.Windows.Forms.Timer`, `System.Data.DataTable.Compute` (expression evaluation), `System.Random` |
+| Resource files | `.resx` (Windows Forms resource file for `Form1`, standard/empty template) |
 
-*(Add colorful screenshots of the game UI here!)*
+## Architecture
 
----
+The application follows the standard WinForms **code-behind** pattern generated by Visual Studio's Windows Forms Designer:
 
-## 🚀 Usage
+- **`Form1.Designer.cs`** — Auto-generated designer code declaring all controls: a player-name text box, a question-count group of 4 radio buttons, level/operation-type combo boxes (pre-populated with their respective option lists), a "Start Game" radio button, question/answer text boxes, "Next Question" and "Check Answer" clickable labels, right/wrong score text boxes, a `Timer` component (1-second interval), a timer-display label, and a "Restart Game" clickable label — wiring each control's relevant event (`CheckedChanged`, `SelectedIndexChanged`, `Click`, `Tick`, `TextChanged`) to a handler in the partial class.
+- **`Form1.cs`** — The code-behind partial class containing all game logic:
+  - `TypeOfOperation()` maps the selected operation-type string to an operator character, or picks one randomly when the type is "Mix" (i.e., any value not matching Add/Sub/Mul/Div).
+  - `LevelOfQuestions()` maps the selected level string to a numeric difficulty tier (1–3), defaulting to tier 4 for "Mix"/anything else.
+  - `Number1()` / `Number2()` generate the two question operands using `Random.Next` with a range determined by the current difficulty tier.
+  - `CheakTheAnswerIsTrue()` (note: contains a typo for "Check") evaluates the question text using `new DataTable().Compute(...)` and compares it (as a `float`) against the player's typed answer (parsed as a `double`).
+  - `CompleteGame()` calls the answer-check function, shows a True/False message box, updates the appropriate score field, and stops the timer.
+  - `NextQuestion()` / `StartGame()` generate a new question string and (re)start the countdown timer.
+  - `EndTheGame()` compares total right vs. wrong answers to declare a win/lose/draw result and disables the level/operation-type selectors.
+  - `RestartGame()` resets all game state fields and UI controls back to their initial values.
+  - `timer1_Tick` decrements the countdown each second, updates the timer label, and — on reaching zero — stops the timer, shows a "lost" message, disables answer checking, and counts the question as wrong.
 
-1. 📥 Clone the repository.  
-2. 🖥️ Open the project in **Visual Studio**.  
-3. ⚡ Build and run the solution.  
-4. 🎉 Play the game and **practice your math skills!**
+### Notable implementation details
 
----
+- The `Number1()`/`Number2()` difficulty ranges pass the difficulty tier's *upper bound* as the exclusive maximum to `Random.Next(min, max)`, so, for example, "Hard" generates operands from 1 up to (but not including) 15.
+- Expression evaluation is delegated to `System.Data.DataTable.Compute` rather than a custom parser, similar in approach to other calculator-style projects.
+- The "Start Game", "Next Question", and "Check Answer" controls are implemented as a `RadioButton` and `Label` controls respectively (not standard `Button`s), consistent with a UI style seen across this developer's other WinForms projects.
+- `RestartGame()` does not reset the `CbQuestionsLevel`/`CbOperationType` *selected values* used internally (`QuestionLevel`/`OperationType` string fields) — it only clears the combo boxes' displayed `Text`, so the underlying fields retain their previous values until the user makes a new selection (see [Known Limitations](#known-limitations)).
+- The player name text box and its "Name:" label are present in the UI but the entered name does not appear to be used anywhere in the game logic (e.g., not shown in the win/lose message boxes).
 
-## 👨‍💻 Author
+## Project Structure
 
-- [Baraa Mardini]  
+```
+لعبة Math Game/
+├── Form1.cs             # Code-behind: game state, timer logic, question generation, scoring
+├── Form1.Designer.cs    # Auto-generated: control declarations and layout for the game UI
+└── Form1.resx           # Resource file for Form1 (no custom resources present)
+```
 
----
+> **Note:** Only these three files were provided for analysis. A complete WinForms project would also typically include a `.csproj`/`.sln` file and `Program.cs` (application entry point), neither of which were supplied, so they are not documented here.
+
+## Requirements
+
+- Windows OS (WinForms applications run on Windows; cross-platform support depends on the target .NET version, which is not specified in the provided files).
+- .NET / .NET Framework SDK compatible with Windows Forms (exact version not specified — no project file was provided).
+- Visual Studio (recommended) or another IDE/build toolchain capable of building WinForms projects.
+
+## Installation
+
+Since no `.csproj`/`.sln` project file was included in the provided files, exact build commands cannot be determined. In general, to run this project you would:
+
+1. Open the project in Visual Studio (create a new **Windows Forms App** project if a project file does not already exist, and add `Form1.cs`, `Form1.Designer.cs`, and `Form1.resx` to it).
+2. Restore any NuGet dependencies, if applicable (none are referenced in the provided code — only standard .NET/WinForms namespaces are used: `System`, `System.Windows.Forms`, `System.Data`, etc.).
+3. Build the solution.
+
+## Configuration
+
+Not specified. No configuration files (e.g., `app.config`, environment variables, connection strings) are present in the provided project files.
+
+## Running the Project
+
+Open the project in Visual Studio and run/debug `Form1` as the startup form (F5), or run the compiled executable produced by the build once a project file is configured.
+
+Once running:
+1. (Optional) Edit the player name field.
+2. Select the number of questions (3, 5, 10, or 15).
+3. Choose a question level (`Easy`, `Med`, `Hard`, `Mix`) and an operation type (`Add`, `Sub`, `Mul`, `Div`, `Mix`).
+4. Check the "Start Game" control to generate the first question and begin the 10-second timer.
+5. Type an answer and click "Check Answer" before time runs out, then click "Next Question" to continue.
+6. After all questions are answered, review the win/lose/draw result, and use "Restart Game" to play again.
+
+## Development
+
+Not specified beyond standard WinForms Designer workflow: modify UI layout via the Visual Studio Form Designer (which updates `Form1.Designer.cs`), and add/edit game logic in `Form1.cs`.
+
+## Build
+
+Not specified — no build scripts or project files were provided.
+
+## Testing
+
+Not specified. No test project, test files, or testing framework references were found in the provided files.
+
+## API Documentation
+
+Not applicable. This is a standalone desktop WinForms application with no exposed APIs, web endpoints, or network calls.
+
+## Database
+
+Not applicable. No database or persistent data storage is used. `System.Data.DataTable` is used only as a built-in mechanism to evaluate arithmetic expression strings, not for data persistence.
+
+## Deployment
+
+Not specified. No Docker, CI/CD, or deployment configuration files were provided.
+
+## Security Notes
+
+- The player's typed answer and the generated question expression are evaluated via `DataTable.Compute` with no explicit validation beyond the implicit parsing it performs; a malformed or empty answer/question could raise an unhandled exception rather than a user-friendly error.
+- No authentication, authorization, or network communication is present, as this is a fully local, offline desktop application.
+
+## Performance Notes
+
+Not applicable. This is a simple, single-form desktop application using a standard 1-second WinForms `Timer`; there is no caching, background processing, or performance-sensitive computation.
+
+## Known Limitations
+
+- No project file (`.csproj`/`.sln`) or application entry point (`Program.cs`) was provided, so the project cannot be built as-is from the supplied files alone.
+- No error handling around `DataTable.Compute` or the answer-parsing (`Convert.ToDouble`) calls — a malformed question or a non-numeric typed answer will raise an unhandled exception.
+- `RestartGame()` clears the combo boxes' displayed text but does not reset the internal `QuestionLevel`/`OperationType` string fields, which could leave stale values in effect until the user re-selects a level/operation type.
+- The player-name input has no visible effect on gameplay or the end-of-game messages.
+- The countdown timer auto-fails a question at zero but does not automatically advance to the next question — the player must still click "Next Question" manually after a timeout.
+- "Next Question" and "Check Answer" are implemented as clickable `Label` controls rather than `Button` controls, which may affect keyboard accessibility and standard button behavior.
+- No automated tests are present.
+
+## Future Improvements
+
+- Add error handling around expression evaluation and answer parsing to avoid unhandled exceptions on invalid input.
+- Fully reset `QuestionLevel`/`OperationType` internal state (not just the combo box text) in `RestartGame()`.
+- Use the entered player name in the win/lose/draw result messages for a more personalized experience.
+- Automatically advance to the next question (or end the game) when the timer runs out, rather than requiring a manual click.
+- Replace `Label`-based interactive controls with `Button` controls for more standard, accessible UI interaction.
+- Add a proper .NET project file and entry point so the project builds out of the box.
+- Add unit tests for the question-generation, answer-checking, and scoring logic.
+
+## Contributing
+
+Contributions are welcome. To contribute:
+
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/my-feature`).
+3. Make your changes and commit them with clear messages.
+4. Push to your fork and open a Pull Request describing your changes.
+
+Please keep changes focused and consistent with the existing WinForms code-behind style used in this project.
+
+## License
+
+Not specified. No license file was included in the provided project files.
+
+## Author
+
+Baraa Mardini
